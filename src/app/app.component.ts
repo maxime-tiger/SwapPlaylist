@@ -3,6 +3,7 @@ import { RouterOutlet } from '@angular/router';
 import {HttpClient, HttpClientModule, HttpHeaders} from "@angular/common/http";
 import {Buffer} from "buffer";
 import {timeout} from "rxjs";
+import {log} from "@angular-devkit/build-angular/src/builders/ssr-dev-server";
 
 @Component({
   selector: 'app-root',
@@ -16,9 +17,9 @@ export class AppComponent {
   // LINK
   AUTHORIZE_URL = new URL('https://accounts.spotify.com/authorize');
   TOKEN_URL = 'https://accounts.spotify.com/api/token';
+  USER_PLAYLIST = 'https://api.spotify.com/v1/me/playlists';
   // SECRETS
   CLIENT_ID = '3f82b5f665af4633b622356a81534e22';
-  CLIENT_SECRET = 'fad1fd57b253473daee79c66eae218eb';
   REDIRECT_URI = 'http://localhost:4200';
   SCOPE = 'user-read-private user-read-email';
 
@@ -44,17 +45,21 @@ export class AppComponent {
   }
 
   async getPlaylist() {
-    await this.valideToken();
-
-    let url = 'https://api.spotify.com/v1/me/playlists';
+    console.log('getPlaylist')
+    window.setTimeout(()=>{
+      console.log('wait token')
+      this.valideToken();
+      console.log('new token')
+    }, 1000);
 
     const payload = {
       method: 'GET',
       headers: {'Authorization': 'Bearer ' + localStorage.getItem('access_token')}
     }
-
-    const body = await fetch(url, payload);
+    const body = await fetch(this.USER_PLAYLIST, payload);
     const response = await body.json();
+
+    console.log(response)
 
     response.items.forEach((playlist :any) => {
       console.log(playlist.name);
@@ -103,9 +108,34 @@ export class AppComponent {
     localStorage.setItem('expire_date', expire_date.toString());
   }
 
-  // TODO Create refresh token method => https://developer.spotify.com/documentation/web-api/tutorials/refreshing-tokens
   async refreshToken() {
-    await this.getToken();
+    const refreshTokenCheck = localStorage.getItem('refresh_token');
+    let refreshToken;
+    if (refreshTokenCheck == null) {
+      refreshToken = '';
+    } else {
+      refreshToken = refreshTokenCheck;
+    }
+
+    const payload = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: new URLSearchParams({
+        grant_type: 'refresh_token',
+        refresh_token: refreshToken,
+        client_id: this.CLIENT_ID
+      }),
+    }
+    const body = await fetch(this.TOKEN_URL, payload);
+    const response = await body.json();
+
+    let currentDate = new Date();
+    let expire_date = currentDate.setHours(currentDate.getDate() + 1);
+    localStorage.setItem('access_token', response.access_token);
+    localStorage.setItem('refresh_token', response.refresh_token);
+    localStorage.setItem('expire_date', expire_date.toString());
   }
 
   async valideToken() {
