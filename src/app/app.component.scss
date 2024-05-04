@@ -1,0 +1,41 @@
+.playlists {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  row-gap: 5px;
+
+  .playlist {
+    display: flex;
+    flex-flow: row nowrap;
+    height: 9.5rem;
+    width: 470px;
+    background-color: #a9a9a9;
+    border: 1px solid #000;
+    transition: background-color ease-in-out .15s;
+
+    div {
+      width: calc(100% - 0.5rem);
+      height: calc(100% - 0.5rem);
+      padding-top: 0.5rem;
+      padding-left: 0.5rem;
+
+      h3,
+      p {
+        margin: 0;
+      }
+
+      h3 {
+        font-size: 20px;
+      }
+    }
+
+    &:hover {
+      background-color: #8c8a8a;
+      cursor: pointer;
+    }
+
+    & .active {
+      background-color: #8c8a8a;
+    }
+  }
+}
