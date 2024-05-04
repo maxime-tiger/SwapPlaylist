@@ -1,16 +1,14 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import {HttpClient, HttpClientModule, HttpHeaders} from "@angular/common/http";
-import {Buffer} from "buffer";
-import {timeout} from "rxjs";
-import {log} from "@angular-devkit/build-angular/src/builders/ssr-dev-server";
+import {Component} from '@angular/core';
+import {RouterOutlet} from '@angular/router';
+import {HttpClient, HttpClientModule} from "@angular/common/http";
+import {NgForOf, NgIf, NgOptimizedImage} from "@angular/common";
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, HttpClientModule],
+  imports: [RouterOutlet, HttpClientModule, NgIf, NgForOf, NgOptimizedImage],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  styleUrl: './app.component.scss'
 })
 export class AppComponent {
   title = 'swap-playlist';
@@ -22,6 +20,7 @@ export class AppComponent {
   CLIENT_ID = '3f82b5f665af4633b622356a81534e22';
   REDIRECT_URI = 'http://localhost:4200';
   SCOPE = 'user-read-private user-read-email';
+  playlists = null;
 
   constructor(private http: HttpClient) {}
 
@@ -45,11 +44,8 @@ export class AppComponent {
   }
 
   async getPlaylist() {
-    console.log('getPlaylist')
     window.setTimeout(()=>{
-      console.log('wait token')
       this.valideToken();
-      console.log('new token')
     }, 1000);
 
     const payload = {
@@ -59,11 +55,7 @@ export class AppComponent {
     const body = await fetch(this.USER_PLAYLIST, payload);
     const response = await body.json();
 
-    console.log(response)
-
-    response.items.forEach((playlist :any) => {
-      console.log(playlist.name);
-    })
+    this.playlists = response.items;
   }
 
   async getToken() {
