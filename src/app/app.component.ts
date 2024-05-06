@@ -130,8 +130,11 @@ export class AppComponent {
     localStorage.setItem('expire_date', expire_date.toString());
   }
 
+  // TODO : fix obtention / refresh token
   async valideToken() {
     let expire_date = localStorage.getItem('expire_date');
+      await this.getToken();
+      // await this.refreshToken();
 
     if (expire_date === null) {
       await this.getToken();
@@ -157,6 +160,30 @@ export class AppComponent {
       .replace(/=/g, '')
       .replace(/\+/g, '-')
       .replace(/\//g, '_');
+  }
+
+  selectPlaylist(event :any) {
+    let parentElem = null;
+    let elem = event.target;
+
+    while(parentElem == null) {
+      console.log(elem)
+      if (!elem.classList.contains('playlist')) {
+        console.log('no playlist')
+        elem = elem.parentNode
+      } else {
+        console.log('get playlist')
+        parentElem = elem
+      }
+    }
+
+    let playlists = document.getElementsByClassName('playlists');
+    Array.from(playlists).forEach(playlist => {
+      if (playlist.classList.contains('selected')) {
+        playlist.classList.remove('selected');
+      }
+    })
+    parentElem.classList.add('selected');
   }
 }
 

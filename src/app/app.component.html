@@ -1,7 +1,11 @@
-<!--<button (click)="getToken()">get Token</button>-->
-<!--<button (click)="getArtist()">get artist</button>-->
-<!--<button (click)="getPlaylist()">get my playlists</button>-->
-<!--<button (click)="authorize()">authorize</button>-->
 <button (click)="login()">Login with Spotify</button>
 <button (click)="getPlaylist()">Get Playlists</button>
-
+<div *ngIf="playlists != null" class="playlists">
+  <div *ngFor="let playlist of playlists;" class="playlist" id="{{playlist.id}}" (click)="selectPlaylist($event)">
+    <img ngSrc="{{playlist.images[0].url}} "width="150" height="150" alt="playlist">
+    <div>
+      <h3>{{playlist.name}}</h3>
+      <p>{{playlist.description}}</p>
+    </div>
+  </div>
+</div>
